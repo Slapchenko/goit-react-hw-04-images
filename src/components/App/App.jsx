@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box } from './App.styled';
 import { Searchbar } from '../Searchbar';
 import { ImageGallery } from '../ImageGallery';
@@ -18,6 +18,39 @@ export function App() {
   const [showModal, setShowModal] = useState(false);
   const [currImg, setCurrImg] = useState(null);
   const [showLoadMore, setShowLoadMore] = useState(false);
+
+  useEffect(() => {
+    try {
+      setIsLoading(true);
+
+      const images = async () => {
+        const fetchImages = await API.getImages(query, page);
+      };
+
+      if (images.totalHits > API.perPage) {
+        this.setState({ showLoadMore: true });
+      }
+
+      if (nextPage + 1 > Math.ceil(images.totalHits / API.perPage)) {
+        this.setState({ isLoading: false, showLoadMore: false });
+      }
+
+      if (images.total === 0) {
+        toast.warn('Your search did not return any results.', {
+          theme: 'dark',
+        });
+        this.setState({ isLoading: false });
+        return;
+      }
+
+      this.setState(prevState => ({
+        images: [...prevState.images, ...images.hits],
+        isLoading: false,
+      }));
+    } catch (error) {
+      this.setState({ error: true, isLoading: false });
+    }
+  }, [page, query]);
 
   //   return (
   //   <Box>
