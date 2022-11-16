@@ -23,20 +23,29 @@ export function App() {
     try {
       setIsLoading(true);
 
-      const fetchImages = async () => {
-        const images = await API.getImages(query, page);
-      };
+      const { newImg } = API.getImages(query, page);
 
-      if (fetchImages.totalHits > API.perPage) {
+      // const {
+      //   images: newImg,
+      // } = async () => {
+      //   return await API.getImages(query, page);
+      // };
+      // const fetchImages = async () => {
+      //   const images = await API.getImages(query, page);
+      // };
+
+      console.log(newImg);
+
+      if (newImg.totalHits > API.perPage) {
         setShowLoadMore(true);
       }
 
-      if (page + 1 > Math.ceil(fetchImages.totalHits / API.perPage)) {
+      if (page + 1 > Math.ceil(newImg.totalHits / API.perPage)) {
         setIsLoading(false);
         setShowModal(false);
       }
 
-      if (fetchImages.total === 0) {
+      if (newImg.total === 0) {
         toast.warn('Your search did not return any results.', {
           theme: 'dark',
         });
@@ -44,7 +53,7 @@ export function App() {
         return;
       }
 
-      setImages(state => [...state, fetchImages.hits]);
+      setImages(state => [...state, newImg.hits]);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -52,23 +61,61 @@ export function App() {
     }
   }, [page, query]);
 
-  //   return (
-  //   <Box>
-  //     <Searchbar onSubmit={this.handleFormSubmit} />
-  //     <ImageGallery images={images} onClick={this.handleImgClick} />
-  //     {showLoadMore && <Button onLoadMore={this.loadMore} />}
-  //     <Loader isLoading={isLoading} />
-  //     {showModal && (
-  //       <Modal
-  //         onClose={this.toggleModal}
-  //         link={currImg.largeImageURL}
-  //         tags={currImg.tags}
-  //       />
-  //     )}
-  //     <ToastContainer />
-  //     {error && toast.error(`Oops something went wrong, try again.`)}
-  //   </Box>
-  // );
+  const handleFormSubmit = async ({ query: keyword }) => {
+    if (keyword === '') {
+      toast.warn('In the Search field, enter the text to be searched.', {
+        theme: 'dark',
+      });
+      return;
+    }
+
+    setPage(1);
+    setQuery(keyword);
+    setImages([]);
+
+    // if (query === keyword && page === 1) {
+    //   try {
+    //     setIsLoading(true);
+
+    //     const fetchImages = API.getImages(query, page);
+
+    //     setImages([images.hits]);
+    //     setIsLoading(false);
+    //   } catch (error) {
+    //     setIsLoading(false);
+    //     setError(true);
+    //   }
+    // }
+  };
+
+  const loadMore = () => setPage(state => state + 1);
+
+  const toggleModal = () => {
+    setShowModal(showModal => !showModal);
+  };
+
+  const handleImgClick = (largeImageURL, tags) => {
+    toggleModal();
+    setCurrImg({ largeImageURL, tags });
+  };
+
+  return (
+    <Box>
+      <Searchbar onSubmit={handleFormSubmit} />
+      <ImageGallery images={images} onClick={handleImgClick} />
+      {showLoadMore && <Button onLoadMore={loadMore} />}
+      <Loader isLoading={isLoading} />
+      {showModal && (
+        <Modal
+          onClose={toggleModal}
+          link={currImg.largeImageURL}
+          tags={currImg.tags}
+        />
+      )}
+      <ToastContainer />
+      {error && toast.error(`Oops something went wrong, try again.`)}
+    </Box>
+  );
 }
 
 // export class App extends Component {
