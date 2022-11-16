@@ -23,32 +23,32 @@ export function App() {
     try {
       setIsLoading(true);
 
-      const images = async () => {
-        const fetchImages = await API.getImages(query, page);
+      const fetchImages = async () => {
+        const images = await API.getImages(query, page);
       };
 
-      if (images.totalHits > API.perPage) {
-        this.setState({ showLoadMore: true });
+      if (fetchImages.totalHits > API.perPage) {
+        setShowLoadMore(true);
       }
 
-      if (nextPage + 1 > Math.ceil(images.totalHits / API.perPage)) {
-        this.setState({ isLoading: false, showLoadMore: false });
+      if (page + 1 > Math.ceil(fetchImages.totalHits / API.perPage)) {
+        setIsLoading(false);
+        setShowModal(false);
       }
 
-      if (images.total === 0) {
+      if (fetchImages.total === 0) {
         toast.warn('Your search did not return any results.', {
           theme: 'dark',
         });
-        this.setState({ isLoading: false });
+        setIsLoading(false);
         return;
       }
 
-      this.setState(prevState => ({
-        images: [...prevState.images, ...images.hits],
-        isLoading: false,
-      }));
+      setImages(state => [...state, fetchImages.hits]);
+      setIsLoading(false);
     } catch (error) {
-      this.setState({ error: true, isLoading: false });
+      setIsLoading(false);
+      setError(true);
     }
   }, [page, query]);
 
