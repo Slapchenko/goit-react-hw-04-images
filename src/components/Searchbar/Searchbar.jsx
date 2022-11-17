@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
 import { useState } from 'react';
 import {
   Header,
@@ -13,8 +14,15 @@ export function Searchbar({ onSubmit }) {
 
   const handleSubmit = e => {
     e.preventDefault();
+
+    if (query === '') {
+      toast.warn('In the Search field, enter the text to be searched.', {
+        theme: 'dark',
+      });
+      return;
+    }
+
     onSubmit(query);
-    console.log(query);
   };
 
   const handleChange = e => {
