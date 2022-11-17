@@ -68,20 +68,20 @@ export function App() {
     setPage(1);
     setQuery(keyword);
     setImages([]);
+    
+    if (query === keyword && page === 1) {
+      try {
+        setIsLoading(true);
 
-    // if (query === keyword && page === 1) {
-    //   try {
-    //     setIsLoading(true);
+        const images = await API.getImages(query, page);
 
-    //     const fetchImages = API.getImages(query, page);
-
-    //     setImages([images.hits]);
-    //     setIsLoading(false);
-    //   } catch (error) {
-    //     setIsLoading(false);
-    //     setError(true);
-    //   }
-    // }
+        setImages([images.hits]);
+        setIsLoading(false);
+      } catch (error) {
+        setIsLoading(false);
+        setError(true);
+      }
+    }
   };
 
   const loadMore = () => setPage(state => state + 1);
