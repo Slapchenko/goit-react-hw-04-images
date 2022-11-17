@@ -20,6 +20,10 @@ export function App() {
   const [showLoadMore, setShowLoadMore] = useState(false);
 
   useEffect(() => {
+    if (query === '') {
+      return;
+    }
+
     async function fetchImages() {
       try {
         setIsLoading(true);
