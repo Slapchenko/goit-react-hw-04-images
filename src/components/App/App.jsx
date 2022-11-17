@@ -13,7 +13,6 @@ export function App() {
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState('');
   const [images, setImages] = useState([]);
-  const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [currImg, setCurrImg] = useState(null);
@@ -50,7 +49,7 @@ export function App() {
         setImages(state => [...state, ...images.hits]);
         setIsLoading(false);
       } catch (error) {
-        setError(true);
+        toast.error(`Oops something went wrong, try again.`);
         setIsLoading(false);
       }
     }
@@ -68,7 +67,7 @@ export function App() {
     setPage(1);
     setQuery(keyword);
     setImages([]);
-    
+
     if (query === keyword && page === 1) {
       try {
         setIsLoading(true);
@@ -78,8 +77,8 @@ export function App() {
         setImages([images.hits]);
         setIsLoading(false);
       } catch (error) {
+        toast.error(`Oops something went wrong, try again.`);
         setIsLoading(false);
-        setError(true);
       }
     }
   };
@@ -109,7 +108,6 @@ export function App() {
         />
       )}
       <ToastContainer />
-      {error && toast.error(`Oops something went wrong, try again.`)}
     </Box>
   );
 }
