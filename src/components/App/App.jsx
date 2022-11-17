@@ -20,45 +20,37 @@ export function App() {
   const [showLoadMore, setShowLoadMore] = useState(false);
 
   useEffect(() => {
-    try {
-      setIsLoading(true);
+    async function fetchImages() {
+      try {
+        setIsLoading(true);
 
-      const { newImg } = API.getImages(query, page);
+        const images = await API.getImages(query, page);
 
-      // const {
-      //   images: newImg,
-      // } = async () => {
-      //   return await API.getImages(query, page);
-      // };
-      // const fetchImages = async () => {
-      //   const images = await API.getImages(query, page);
-      // };
+        if (images.totalHits > API.perPage) {
+          setShowLoadMore(true);
+        }
 
-      console.log(newImg);
+        if (page + 1 > Math.ceil(images.totalHits / API.perPage)) {
+          setIsLoading(false);
+          setShowLoadMore(false);
+        }
 
-      if (newImg.totalHits > API.perPage) {
-        setShowLoadMore(true);
-      }
+        if (images.total === 0) {
+          toast.warn('Your search did not return any results.', {
+            theme: 'dark',
+          });
+          setIsLoading(false);
+          return;
+        }
 
-      if (page + 1 > Math.ceil(newImg.totalHits / API.perPage)) {
+        setImages(state => [...state, ...images.hits]);
         setIsLoading(false);
-        setShowModal(false);
-      }
-
-      if (newImg.total === 0) {
-        toast.warn('Your search did not return any results.', {
-          theme: 'dark',
-        });
+      } catch (error) {
+        setError(true);
         setIsLoading(false);
-        return;
       }
-
-      setImages(state => [...state, newImg.hits]);
-      setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
-      setError(true);
     }
+    fetchImages();
   }, [page, query]);
 
   const handleFormSubmit = async ({ query: keyword }) => {
