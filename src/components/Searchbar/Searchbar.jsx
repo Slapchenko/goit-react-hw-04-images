@@ -14,6 +14,7 @@ export function Searchbar({ onSubmit }) {
   const handleSubmit = e => {
     e.preventDefault();
     onSubmit(query);
+    console.log(query);
   };
 
   const handleChange = e => {

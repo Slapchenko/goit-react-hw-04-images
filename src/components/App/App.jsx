@@ -56,13 +56,15 @@ export function App() {
     fetchImages();
   }, [page, query]);
 
-  const handleFormSubmit = async ({ query: keyword }) => {
+  const handleFormSubmit = async ( keyword ) => {
     if (keyword === '') {
       toast.warn('In the Search field, enter the text to be searched.', {
         theme: 'dark',
       });
       return;
     }
+
+    console.log(keyword);
 
     setPage(1);
     setQuery(keyword);
